@@ -9,11 +9,19 @@ const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       {
+        path: 'create',
+        loadChildren: () => import('./pages/tasks-save/tasks-save.module').then( m => m.TasksSavePageModule)
+      },
+      {
+        path: 'edit/:id',
+        loadChildren: () => import('./pages/tasks-save/tasks-save.module').then( m => m.TasksSavePageModule)
+      },
+      {
         path: '',
         loadChildren: () => import('./pages/tasks-list/tasks-list.module').then(m => m.TasksListPageModule),
       }
     ],
-  }
+  },
 ];
 
 @NgModule({
