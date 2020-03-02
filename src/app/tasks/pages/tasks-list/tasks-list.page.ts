@@ -6,6 +6,9 @@ import { NavController } from '@ionic/angular';
 import { OverlayService } from 'src/app/core/services/overlay.service';
 import { take } from 'rxjs/operators';
 
+import { Plugins, CameraResultType, CameraSource } from '@capacitor/core';
+import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-tasks-list',
   templateUrl: './tasks-list.page.html',
@@ -14,11 +17,13 @@ import { take } from 'rxjs/operators';
 export class TasksListPage implements OnInit {
 
   public tasks$: Observable<Task[]>;
+  public photo: SafeResourceUrl;
 
   constructor(
     private tasksService: TasksService,
     private navCtrl: NavController,
     private overlayService: OverlayService,
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit() {
@@ -58,7 +63,18 @@ export class TasksListPage implements OnInit {
     await this.tasksService.update(taskToUpdate);
     await this.overlayService.toast({
       message: `Task "${taskToUpdate.title}" ${taskToUpdate.done ? 'completed' : 'updated'} !`,
-    })
+    });
+  }
+
+  async takePicture() {
+    const image = await Plugins.Camera.getPhoto({
+      quality: 100,
+      allowEditing: false,
+      resultType: CameraResultType.DataUrl,
+      source: CameraSource.Camera
+    });
+
+    this.photo = this.sanitizer.bypassSecurityTrustResourceUrl(image && (image.dataUrl));
   }
 
 }
